@@ -29,8 +29,8 @@ internal class JSONSerializer {
     static func serialize(_ channel : Channel, command: Command, data: ActionPayload?) throws -> String {
         
         do {
-            var identifierDict : ChannelIdentifier
-            if let identifier = channel.identifier {
+            var identifierDict : ChannelParameters
+            if let identifier = channel.parameters {
                 identifierDict = identifier
             } else {
                 identifierDict = Dictionary()

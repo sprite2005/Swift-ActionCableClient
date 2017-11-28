@@ -22,7 +22,7 @@
 
 import Foundation
 
-public typealias ChannelIdentifier = ActionPayload
+public typealias ChannelParameters = ActionPayload
 public typealias OnReceiveClosure = ((Any?, Swift.Error?) -> (Void))
 
 /// A particular channel on the server.
@@ -31,8 +31,8 @@ open class Channel: Hashable, Equatable {
     /// Name of the channel
     open var name : String
     
-    /// Identifier
-    open var identifier: Dictionary<String, Any>?
+    /// Parameters
+    open var parameters: ChannelParameters?
     
     /// Auto-Subscribe to channel on initialization and re-connect?
     open var autoSubscribe : Bool
@@ -59,7 +59,7 @@ open class Channel: Hashable, Equatable {
     ///     - error: An error when decoding of the message failed.
     ///
     open var onReceive: ((Any?, Swift.Error?) -> Void)?
-  
+
     /// A block called when the channel has been successfully subscribed.
     ///
     /// Note: This block will be called if the client disconnects and then
@@ -81,12 +81,12 @@ open class Channel: Hashable, Equatable {
     /// by the server.
     open var onRejected: (() -> Void)?
 
-    internal init(name: String, identifier: ChannelIdentifier?, client: ActionCableClient, autoSubscribe: Bool=true, shouldBufferActions: Bool=true) {
+    internal init(name: String, parameters: ChannelParameters?, client: ActionCableClient, autoSubscribe: Bool=true, shouldBufferActions: Bool=true) {
         self.name = name
         self.client = client
         self.autoSubscribe = autoSubscribe
         self.shouldBufferActions = shouldBufferActions
-        self.identifier = identifier
+        self.parameters = parameters
     }
     
     open func onReceive(_ action:String, handler: @escaping (OnReceiveClosure)) -> Void {

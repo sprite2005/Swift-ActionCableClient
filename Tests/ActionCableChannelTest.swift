@@ -87,7 +87,7 @@ class ActionCableChannelTest : QuickSpec {
             context("Manual Subscribing") {
                 beforeEach {
                     client = ActionCableClient(url: TestConfiguration.GoodURL)
-                    channel = client!.create(TestConfiguration.EchoChannel, identifier: nil, autoSubscribe: false, bufferActions: true)
+                    channel = client!.create(TestConfiguration.EchoChannel, parameters: nil, autoSubscribe: false, bufferActions: true)
                     waitUntil(timeout: 1.0, action: { (done) -> Void in
                         client?.connect()
                         client?.onConnected = {
@@ -190,7 +190,7 @@ class ActionCableChannelTest : QuickSpec {
                 
                 beforeEach {
                     client = ActionCableClient(url: TestConfiguration.GoodURL)
-                    channel = client!.create(TestConfiguration.EchoChannel, identifier: nil, autoSubscribe: true, bufferActions: false)
+                    channel = client!.create(TestConfiguration.EchoChannel, parameters: nil, autoSubscribe: true, bufferActions: false)
                     channel!.onSubscribed = {
                         channel!.action(TestConfiguration.EchoChannelAction, with: params)
                     }
@@ -284,7 +284,7 @@ class ActionCableChannelTest : QuickSpec {
                 
                 beforeEach {
                     client = ActionCableClient(url: TestConfiguration.GoodURL)
-                    channel = client!.create(TestConfiguration.EchoChannel, identifier: nil, autoSubscribe: true, bufferActions: false)
+                    channel = client!.create(TestConfiguration.EchoChannel, parameters: nil, autoSubscribe: true, bufferActions: false)
                     channel!.action(TestConfiguration.EchoChannelAction, with: params)
                     client?.connect()
                     channel!.onReceive = {(obj: Any?, error: Error?) in
