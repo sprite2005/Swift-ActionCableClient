@@ -46,7 +46,7 @@ open class Channel: Hashable, Equatable {
     
     /// Subscribed
     open var isSubscribed : Bool {
-        return client.subscribed(name)
+        return client.subscribed(identifier: identifier)
     }
     
     /// A block called when a message has been received on this channel.
@@ -88,14 +88,14 @@ open class Channel: Hashable, Equatable {
     internal init(name: String, parameters: ChannelParameters?, client: ActionCableClient, autoSubscribe: Bool=true, shouldBufferActions: Bool=true) {
         self.name = name
         self.parameters = parameters
-        self.identifier = Channel.computeIdentifier(name, parameters)
+        self.identifier = Channel.identifierFor(name: name, parameters: parameters)
 
         self.client = client
         self.autoSubscribe = autoSubscribe
         self.shouldBufferActions = shouldBufferActions
     }
 
-    private static func computeIdentifier(_ name: String, _ parameters: ChannelParameters?) -> String {
+    open static func identifierFor(name: String, parameters: ChannelParameters?) -> String {
         var identifierDict = parameters ?? [:]
         identifierDict["channel"] = name
 
@@ -199,7 +199,7 @@ open class Channel: Hashable, Equatable {
 }
 
 public func ==(lhs: Channel, rhs: Channel) -> Bool {
-  return (lhs.hashValue == rhs.hashValue) && (lhs.name == rhs.name)
+  return (lhs.hashValue == rhs.hashValue) && (lhs.identifier == rhs.identifier)
 }
 
 extension Channel {
