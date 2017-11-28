@@ -33,7 +33,10 @@ open class Channel: Hashable, Equatable {
     
     /// Parameters
     open var parameters: ChannelParameters?
-    
+
+    /// Channel identifier shared between the client and the server
+    open var identifier: String
+
     /// Auto-Subscribe to channel on initialization and re-connect?
     open var autoSubscribe : Bool
     
@@ -81,18 +84,32 @@ open class Channel: Hashable, Equatable {
     /// by the server.
     open var onRejected: (() -> Void)?
 
+
     internal init(name: String, parameters: ChannelParameters?, client: ActionCableClient, autoSubscribe: Bool=true, shouldBufferActions: Bool=true) {
         self.name = name
+        self.parameters = parameters
+        self.identifier = Channel.computeIdentifier(name, parameters)
+
         self.client = client
         self.autoSubscribe = autoSubscribe
         self.shouldBufferActions = shouldBufferActions
-        self.parameters = parameters
     }
-    
+
+    private static func computeIdentifier(_ name: String, _ parameters: ChannelParameters?) -> String {
+        var identifierDict = parameters ?? [:]
+        identifierDict["channel"] = name
+
+        // If something is wrong with the parameters, the developer will be warn with a runtime exception.
+        let JSONData = try! JSONSerialization.data(withJSONObject: identifierDict, options: JSONSerialization.WritingOptions(rawValue: 0))
+        return NSString(data: JSONData, encoding: String.Encoding.utf8.rawValue)! as String
+    }
+
+
     open func onReceive(_ action:String, handler: @escaping (OnReceiveClosure)) -> Void {
         onReceiveActionHooks[action] = handler
     }
-    
+
+
     /// Subscript for `action:`.
     ///
     /// Send an action to the server.
