@@ -29,23 +29,10 @@ internal class JSONSerializer {
     static func serialize(_ channel : Channel, command: Command, data: ActionPayload?) throws -> String {
         
         do {
-            var identifierDict : ChannelIdentifier
-            if let identifier = channel.identifier {
-                identifierDict = identifier
-            } else {
-                identifierDict = Dictionary()
-            }
-            
-            identifierDict["channel"] = "\(channel.name)"
-            
-            let JSONData = try JSONSerialization.data(withJSONObject: identifierDict, options: JSONSerialization.WritingOptions(rawValue: 0))
-            guard let identifierString = NSString(data: JSONData, encoding: String.Encoding.utf8.rawValue)
-                  else { throw SerializationError.json }
-            
-            var commandDict = [
+            var commandDict: [String : Any] = [
                 "command" : command.string,
-                "identifier" : identifierString
-            ] as [String : Any]
+                "identifier" : channel.identifier
+            ]
             
             if let _ = data {
                 let JSONData = try JSONSerialization.data(withJSONObject: data!, options: JSONSerialization.WritingOptions(rawValue: 0))
@@ -77,37 +64,16 @@ internal class JSONSerializer {
             if let typeObj = JSONObj["type"], let typeString = typeObj as? String {
               messageType = MessageType(string: typeString)
             }
-          
-            var channelName: String?
-            if let idObj = JSONObj["identifier"] {
-                var idJSON: Dictionary<String, AnyObject>
-                if let idString = idObj as? String {
-                    guard let JSONIdentifierData = idString.data(using: String.Encoding.utf8)
-                      else { throw SerializationError.json }
-                  
-                    if let JSON = try JSONSerialization.jsonObject(with: JSONIdentifierData, options: .allowFragments) as? Dictionary<String, AnyObject> {
-                        idJSON = JSON
-                    } else {
-                        throw SerializationError.json
-                    }
-                } else if let idJSONObj = idObj as? Dictionary<String, AnyObject> {
-                    idJSON = idJSONObj
-                } else {
-                    throw SerializationError.protocolViolation
-                }
-                
-                if let nameStr = idJSON["channel"], let name = nameStr as? String {
-                  channelName = name
-                }
-            }
+
+            let channelIdentifier: String? = JSONObj["identifier"] as? String
           
             switch messageType {
             // Subscriptions
             case .confirmSubscription, .rejectSubscription, .cancelSubscription, .hibernateSubscription:
-                guard let _ = channelName
+                guard let _ = channelIdentifier
                   else { throw SerializationError.protocolViolation }
                 
-                return Message(channelName: channelName,
+                return Message(channelIdentifier: channelIdentifier,
                                actionName:  nil,
                                messageType: messageType,
                                data: nil,
@@ -115,7 +81,7 @@ internal class JSONSerializer {
               
             // Welcome/Ping messages
             case .welcome, .ping:
-                return Message(channelName: nil,
+                return Message(channelIdentifier: nil,
                                actionName: nil,
                                messageType: messageType,
                                data: nil,
@@ -127,7 +93,7 @@ internal class JSONSerializer {
                 
                 do {
                     // No channel name was extracted from identifier
-                    guard let _ = channelName
+                    guard let _ = channelIdentifier
                         else { throw SerializationError.protocolViolation }
                     
                     // No message was extracted from identifier
@@ -143,7 +109,7 @@ internal class JSONSerializer {
                   messageError = error
                 }
                 
-                return Message(channelName: channelName!,
+                return Message(channelIdentifier: channelIdentifier!,
                                actionName: messageActionName,
                                messageType: MessageType.message,
                                data: messageValue,
