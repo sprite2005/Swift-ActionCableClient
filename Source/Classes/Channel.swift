@@ -261,12 +261,8 @@ extension Channel: CustomDebugStringConvertible {
     }
 }
 
-extension Channel: CustomPlaygroundQuickLookable {
-    /// A custom playground quick look for this instance.
-    ///
-    /// If this type has value semantics, the `PlaygroundQuickLook` instance
-    /// should be unaffected by subsequent mutations.
-    public var customPlaygroundQuickLook: PlaygroundQuickLook {
-              return PlaygroundQuickLook.text(self.name)
+extension Channel: CustomPlaygroundDisplayConvertible {
+    public var playgroundDescription: Any {
+        return self.name
     }
 }
