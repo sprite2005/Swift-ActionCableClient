@@ -72,16 +72,15 @@ open class ActionCableClient {
     open var isConnected : Bool { return socket.isConnected }
     open var url: Foundation.URL { return socket.currentURL }
     
-    open var headers : [String: String] {
-        get { return socket.headers }
-        set { socket.headers = newValue }
+    open var headers : [String: String]? {
+        get { return socket.request.allHTTPHeaderFields }
+        set {
+            for (field, value) in headers ?? [:] {
+                socket.request.setValue(value, forHTTPHeaderField: field)
+            }
+        }
     }
-    
-    open var origin : String? {
-        get { return socket.origin }
-        set { socket.origin = newValue }
-    }
-  
+
     /// Initialize an ActionCableClient.
     ///
     /// Each client represents one connection to the server.
@@ -476,9 +475,9 @@ extension ActionCableClient : CustomDebugStringConvertible {
     }
 }
 
-extension ActionCableClient : CustomPlaygroundQuickLookable {
-  public var customPlaygroundQuickLook: PlaygroundQuickLook {
-        return PlaygroundQuickLook.url(socket.currentURL.absoluteString)
+extension ActionCableClient : CustomPlaygroundDisplayConvertible {
+    public var playgroundDescription: Any {
+        return socket.currentURL
     }
 }
 
