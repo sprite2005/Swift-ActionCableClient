@@ -96,6 +96,22 @@ open class ActionCableClient {
         setupWebSocket()
     }
     
+    public required init(url: URL, headers: [String: String]? = nil, origin : String? = nil) {
+        /// Setup Initialize Socket
+        var request = URLRequest(url: url)
+        
+        if let origin = origin {
+            request.setValue(origin, forHTTPHeaderField: "Origin")
+        }
+        
+        for (field, value) in headers ?? [:] {
+            request.setValue(value, forHTTPHeaderField: field)
+        }
+        
+        socket = WebSocket(request: request)
+        setupWebSocket()
+    }
+    
     /// Connect with the server
     @discardableResult
     open func connect() -> ActionCableClient {
