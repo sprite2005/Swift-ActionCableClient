@@ -21,6 +21,7 @@
 //
 
 import Foundation
+import Starscream
 
 enum SerializationError : Swift.Error {
     case json
@@ -67,19 +68,23 @@ public enum ConnectionError : Swift.Error {
     }
   
     init(from error: Swift.Error) {
-      switch error._code {
-      case 2: self = ConnectionError.unknownDomain(error)
-      case 61: self = ConnectionError.refused(error)
-      case 404: self = ConnectionError.notFound(error)
-      case 1000: self = ConnectionError.closed(error)
-      case 1002: self = ConnectionError.protocolViolation(error)
-      case 1003: self = ConnectionError.protocolViolation(error)
-      case 1005: self = ConnectionError.unknown(error)
-      case 1007: self = ConnectionError.protocolViolation(error)
-      case 1008: self = ConnectionError.protocolViolation(error)
-      case 1009: self = ConnectionError.protocolViolation(error)
-      case 9847: self = ConnectionError.sslHandshake(error)
-      default:
+      if let error = error as? Starscream.WSError {
+        switch error.code {
+        case 2: self = ConnectionError.unknownDomain(error)
+        case 61: self = ConnectionError.refused(error)
+        case 404: self = ConnectionError.notFound(error)
+        case 1000: self = ConnectionError.closed(error)
+        case 1002: self = ConnectionError.protocolViolation(error)
+        case 1003: self = ConnectionError.protocolViolation(error)
+        case 1005: self = ConnectionError.unknown(error)
+        case 1007: self = ConnectionError.protocolViolation(error)
+        case 1008: self = ConnectionError.protocolViolation(error)
+        case 1009: self = ConnectionError.protocolViolation(error)
+        case 9847: self = ConnectionError.sslHandshake(error)
+        default:
+          self = ConnectionError.unknown(error)
+        }
+      } else {
         self = ConnectionError.unknown(error)
       }
     }
