@@ -47,6 +47,7 @@ internal enum MessageType {
     case ping
     case message
     case welcome
+    case disconnect
     case unrecognized
     
     var string: String {
@@ -58,6 +59,7 @@ internal enum MessageType {
             case .message: return "message" // STUB!
             case .cancelSubscription: return "cancel_subscription" // STUB!
             case .hibernateSubscription: return "hibernate_subscription" //STUB!
+            case .disconnect: return "disconnect"
             case .unrecognized: return "___unrecognized"
         }
     }
@@ -76,6 +78,8 @@ internal enum MessageType {
                 self = MessageType.cancelSubscription
             case MessageType.hibernateSubscription.string:
                 self = MessageType.hibernateSubscription
+            case MessageType.disconnect.string:
+              self = MessageType.disconnect
             default:
                 self = MessageType.unrecognized
         }

@@ -86,6 +86,14 @@ internal class JSONSerializer {
                                messageType: messageType,
                                data: nil,
                                error: nil)
+              
+            case .disconnect:
+                return Message(channelIdentifier: nil,
+                               actionName: nil,
+                               messageType: messageType,
+                               data: nil,
+                               error: nil)
+              
             case .message, .unrecognized:
                 var messageActionName : String?
                 var messageValue      : AnyObject?
@@ -109,7 +117,7 @@ internal class JSONSerializer {
                   messageError = error
                 }
                 
-                return Message(channelIdentifier: channelIdentifier!,
+                return Message(channelIdentifier: channelIdentifier,
                                actionName: messageActionName,
                                messageType: MessageType.message,
                                data: messageValue,
