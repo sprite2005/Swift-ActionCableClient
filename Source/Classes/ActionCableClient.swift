@@ -428,6 +428,8 @@ extension ActionCableClient {
                 if let callback = onPing {
                     DispatchQueue.main.async(execute: callback)
                 }
+            case .disconnect:
+              break
             case .message:
                 if let channel = channels[message.channelIdentifier!] {
                     // Notify Channel
